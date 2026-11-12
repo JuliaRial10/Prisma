@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Actividad Sexista o Inclusivo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brandDark: '#18171c',
+                        brandBg: '#ffffff',
+                        brandCoral: '#f28b82',
+                        brandTeal: '#4ecdc4',
+                        brandYellow: '#ffe66d',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #18171c;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .card-transition {
+            transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1), opacity 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+        }
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-pulse-soft {
+            animation: pulse-soft 2s infinite ease-in-out;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-white text-brandDark flex flex-col items-center justify-center p-4 selection:bg-brandTeal selection:text-white relative overflow-hidden">
+
+    <!-- Clean Particle / Confetti Container -->
+    <div id="particle-container" class="absolute inset-0 pointer-events-none overflow-hidden z-50"></div>
+
+    <!-- Main Content Container -->
+    <main class="w-full max-w-xl mx-auto flex flex-col items-center justify-center relative min-h-[580px] z-10">
+
+        <!-- Welcome Screen -->
+        <div id="welcome-screen" class="w-full text-center space-y-6 bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-2xl shadow-gray-200/50">
+            <div class="w-16 h-16 bg-brandCoral/15 text-brandCoral rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-sm animate-pulse-soft">
+                <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+            <div class="space-y-4">
+                <h2 class="text-3xl sm:text-4xl font-bold tracking-tight text-brandDark">¿Sexista o Inclusivo?</h2>
+                <p class="text-gray-600 text-lg sm:text-xl leading-relaxed max-w-lg mx-auto font-medium">
+                    Clasifica cada término o expresión. Arrastra la tarjeta hacia la izquierda si es <span class="font-bold text-rose-500">Sexista</span> o hacia la derecha si es <span class="font-bold text-teal-600">Inclusivo</span>.
+                </p>
+            </div>
+            <div class="grid grid-cols-2 gap-4 pt-2 text-sm font-semibold">
+                <div class="p-4 rounded-2xl bg-rose-50/70 border border-rose-100 text-rose-600 flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-arrow-left text-base"></i>
+                    <span>Izquierda: SEXISTA</span>
+                </div>
+                <div class="p-4 rounded-2xl bg-teal-50/70 border border-teal-100 text-teal-700 flex items-center justify-center space-x-2">
+                    <span>Derecha: INCLUSIVO</span>
+                    <i class="fa-solid fa-arrow-right text-base"></i>
+                </div>
+            </div>
+            <button onclick="startActivity()" class="w-full py-4 px-6 bg-brandDark text-white font-semibold rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-300/50 active:scale-[0.98] text-base tracking-wide cursor-pointer">
+                Comenzar Actividad
+            </button>
+        </div>
+
+        <!-- Game Container -->
+        <div id="game-container" class="w-full hidden flex flex-col items-center space-y-6">
+            
+            <!-- Counter Header -->
+            <div class="flex items-center justify-between w-full max-w-md px-2">
+                <span class="text-xs font-semibold tracking-wider uppercase text-gray-400">Desliza para clasificar</span>
+                <div class="text-xs font-semibold bg-gray-100 text-gray-700 px-3 py-1 rounded-full">
+                    <span id="current-index">1</span> / <span id="total-cards">6</span>
+                </div>
+            </div>
+
+            <!-- Cards Deck Wrapper -->
+            <div id="card-stack" class="relative w-full max-w-md h-80 flex items-center justify-center select-none">
+                <!-- Dynamic cards injected here -->
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-center space-x-4 w-full max-w-md pt-2">
+                <button onclick="handleAnswer('Sexista')" class="flex-1 py-3.5 px-6 bg-white border-2 border-rose-100 text-rose-600 hover:bg-rose-50 hover:border-rose-200 font-semibold rounded-2xl shadow-sm transition-all transform active:scale-95 flex items-center justify-center space-x-2 text-sm cursor-pointer">
+                    <i class="fa-solid fa-xmark text-base"></i>
+                    <span>Sexista</span>
+                </button>
+                <button onclick="handleAnswer('Inclusivo')" class="flex-1 py-3.5 px-6 bg-white border-2 border-teal-100 text-teal-700 hover:bg-teal-50 hover:border-teal-200 font-semibold rounded-2xl shadow-sm transition-all transform active:scale-95 flex items-center justify-center space-x-2 text-sm cursor-pointer">
+                    <i class="fa-solid fa-check text-base"></i>
+                    <span>Inclusivo</span>
+                </button>
+            </div>
+            
+            <p class="text-xs text-gray-400 text-center pt-1"><i class="fa-solid fa-circle-info mr-1"></i> Arrastra la tarjeta con el ratón o el dedo hacia los lados</p>
+        </div>
+
+        <!-- Results Screen -->
+        <div id="results-screen" class="w-full hidden text-center space-y-6 bg-white p-8 sm:p-10 rounded-3xl border border-gray-100 shadow-2xl shadow-gray-200/50">
+            <div id="result-icon-wrapper" class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl shadow-sm animate-pulse-soft">
+                <i id="result-icon" class="fa-solid"></i>
+            </div>
+            <div class="space-y-2">
+                <h2 id="result-title" class="text-2xl font-bold tracking-tight text-brandDark">¡Actividad Completada!</h2>
+                <p id="result-subtitle" class="text-gray-500 text-sm leading-relaxed max-w-md mx-auto"></p>
+            </div>
+            <div class="p-6 bg-gray-50/80 rounded-2xl border border-gray-100 flex items-center justify-around">
+                <div>
+                    <span class="block text-xs text-gray-400 uppercase tracking-wider font-semibold">Puntuación</span>
+                    <span id="final-score" class="text-3xl font-bold text-brandDark">0/6</span>
+                </div>
+                <div class="h-10 w-px bg-gray-200"></div>
+                <div>
+                    <span class="block text-xs text-gray-400 uppercase tracking-wider font-semibold">Aciertos</span>
+                    <span id="correct-count" class="text-3xl font-bold text-teal-600">0</span>
+                </div>
+            </div>
+            <button onclick="resetActivity()" class="w-full py-4 px-6 bg-brandDark text-white font-medium rounded-2xl hover:bg-black transition-all shadow-lg shadow-gray-300/50 active:scale-[0.98] text-sm tracking-wide cursor-pointer">
+                Volver a intentar
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Script de lógica interactiva y efectos -->
+    <script>
+        // Sistema de Sonido (Web Audio API sintético sin dependencias externas)
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+            const osc = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            osc.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+
+            const now = audioCtx.currentTime;
+
+            if (type === 'click') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.08);
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } else if (type === 'swipe-correct') {
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(600, now + 0.15);
+                gainNode.gain.setValueAtTime(0.2, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+            } else if (type === 'swipe-incorrect') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(280, now);
+                osc.frequency.exponentialRampToValueAtTime(200, now + 0.18);
+                gainNode.gain.setValueAtTime(0.15, now);
+                gainNode.gain.linearRampToValueAtTime(0.01, now + 0.18);
+                osc.start(now);
+                osc.stop(now + 0.18);
+            } else if (type === 'win') {
+                const notes = [330, 392, 523, 659];
+                notes.forEach((freq, idx) => {
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.connect(g);
+                    g.connect(audioCtx.destination);
+                    o.frequency.setValueAtTime(freq, now + idx * 0.1);
+                    g.gain.setValueAtTime(0.2, now + idx * 0.1);
+                    g.gain.linearRampToValueAtTime(0.01, now + idx * 0.1 + 0.2);
+                    o.start(now + idx * 0.1);
+                    o.stop(now + idx * 0.1 + 0.2);
+                });
+            }
+        }
+
+        // Efectos Visuales de Partículas / Confeti
+        function triggerParticles(isSuccess) {
+            const container = document.getElementById('particle-container');
+            if (!container) return;
+            const colors = isSuccess ? ['#4ecdc4', '#ffe66d', '#18171c'] : ['#f28b82', '#ffe66d', '#18171c'];
+            
+            for (let i = 0; i < 18; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'absolute rounded-full pointer-events-none';
+                const size = Math.random() * 6 + 4;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                const startX = window.innerWidth / 2;
+                const startY = window.innerHeight / 2;
+                particle.style.left = `${startX}px`;
+                particle.style.top = `${startY}px`;
+
+                container.appendChild(particle);
+
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 150 + 50;
+                const destX = startX + Math.cos(angle) * distance;
+                const destY = startY + Math.sin(angle) * distance;
+
+                const anim = particle.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${destX - startX}px, ${destY - startY}px) scale(0.2)`, opacity: 0 }
+                ], {
+                    duration: 500 + Math.random() * 300,
+                    easing: 'cubic-bezier(0, .9, .57, 1)'
+                });
+
+                anim.onfinish = () => {
+                    particle.remove();
+                };
+            }
+        }
+
+        // Data for Sexista o Inclusivo
+        const statements = [
+            {
+                id: 1,
+                text: "Los dirigentes",
+                answer: "Sexista"
+            },
+            {
+                id: 2,
+                text: "Según afirma el legislador",
+                answer: "Sexista"
+            },
+            {
+                id: 3,
+                text: "Los trabajadores",
+                answer: "Sexista"
+            },
+            {
+                id: 4,
+                text: "Los españoles",
+                answer: "Sexista"
+            },
+            {
+                id: 5,
+                text: "La dirección de la empresa",
+                answer: "Inclusivo"
+            },
+            {
+                id: 6,
+                text: "La población española",
+                answer: "Inclusivo"
+            }
+        ];
+
+        let currentIndex = 0;
+        let score = 0;
+
+        const welcomeScreen = document.getElementById('welcome-screen');
+        const gameContainer = document.getElementById('game-container');
+        const resultsScreen = document.getElementById('results-screen');
+        const cardStack = document.getElementById('card-stack');
+        const currentIndexSpan = document.getElementById('current-index');
+        const totalCardsSpan = document.getElementById('total-cards');
+
+        totalCardsSpan.textContent = statements.length;
+
+        function startActivity() {
+            playSound('click');
+            welcomeScreen.classList.add('hidden');
+            gameContainer.classList.remove('hidden');
+            currentIndex = 0;
+            score = 0;
+            renderCurrentCard();
+        }
+
+        function renderCurrentCard() {
+            cardStack.innerHTML = '';
+            if (currentIndex >= statements.length) {
+                showResults();
+                return;
+            }
+
+            currentIndexSpan.textContent = currentIndex + 1;
+            const item = statements[currentIndex];
+
+            const card = document.createElement('div');
+            card.className = 'absolute w-full max-w-md bg-white border border-gray-200/80 rounded-3xl p-8 shadow-xl shadow-gray-100 flex flex-col justify-between h-72 card-transition cursor-grab active:cursor-grabbing';
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold px-3 py-1 rounded-full bg-gray-100 text-gray-500">Término ${currentIndex + 1}</span>
+                    <div class="flex space-x-1.5">
+                        <span class="w-2 h-2 rounded-full bg-[#f28b82]"></span>
+                        <span class="w-2 h-2 rounded-full bg-[#4ecdc4]"></span>
+                        <span class="w-2 h-2 rounded-full bg-[#ffe66d]"></span>
+                    </div>
+                </div>
+                <div class="my-auto text-center px-1">
+                    <p class="text-2xl sm:text-3xl font-bold text-brandDark leading-snug">${item.text}</p>
+                </div>
+                <div class="flex justify-between items-center text-xs text-gray-400 border-t border-gray-100 pt-4">
+                    <span class="text-rose-500 font-semibold flex items-center space-x-1"><i class="fa-solid fa-arrow-left"></i><span>Sexista</span></span>
+                    <span class="text-teal-700 font-semibold flex items-center space-x-1"><span>Inclusivo</span><i class="fa-solid fa-arrow-right"></i></span>
+                </div>
+            `;
+
+            cardStack.appendChild(card);
+            initDragAndSwipe(card, item.answer);
+        }
+
+        // Drag and Swipe logic (Left = Sexista, Right = Inclusivo)
+        function initDragAndSwipe(card, expectedAnswer) {
+            let startX = 0;
+            let currentX = 0;
+            let isDragging = false;
+
+            const onStart = (clientX) => {
+                isDragging = true;
+                startX = clientX;
+                card.style.transition = 'none';
+            };
+
+            const onMove = (clientX) => {
+                if (!isDragging) return;
+                currentX = clientX - startX;
+                const rotate = currentX * 0.06;
+                card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+
+                if (currentX > 40) {
+                    card.style.borderColor = '#4ecdc4';
+                    card.style.backgroundColor = '#f0fdf4';
+                } else if (currentX < -40) {
+                    card.style.borderColor = '#f43f5e';
+                    card.style.backgroundColor = '#fff1f2';
+                } else {
+                    card.style.borderColor = '#e5e7eb';
+                    card.style.backgroundColor = '#ffffff';
+                }
+            };
+
+            const onEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+
+                const threshold = 80;
+                if (currentX > threshold) {
+                    completeMove('Inclusivo', expectedAnswer, card);
+                } else if (currentX < -threshold) {
+                    completeMove('Sexista', expectedAnswer, card);
+                } else {
+                    card.style.transform = 'translateX(0px) rotate(0deg)';
+                    card.style.borderColor = '#e5e7eb';
+                    card.style.backgroundColor = '#ffffff';
+                }
+                currentX = 0;
+            };
+
+            // Mouse Events
+            card.addEventListener('mousedown', (e) => onStart(e.clientX));
+            const mouseMoveHandler = (e) => { if (isDragging) onMove(e.clientX); };
+            const mouseUpHandler = () => { if (isDragging) onEnd(); };
+            window.addEventListener('mousemove', mouseMoveHandler);
+            window.addEventListener('mouseup', mouseUpHandler);
+
+            // Touch Events
+            card.addEventListener('touchstart', (e) => onStart(e.touches[0].clientX));
+            const touchMoveHandler = (e) => { if (isDragging) onMove(e.touches[0].clientX); };
+            const touchEndHandler = () => { if (isDragging) onEnd(); };
+            window.addEventListener('touchmove', touchMoveHandler);
+            window.addEventListener('touchend', touchEndHandler);
+        }
+
+        // Button Click Answer Handler
+        function handleAnswer(userChoice) {
+            playSound('click');
+            const currentItem = statements[currentIndex];
+            const card = cardStack.querySelector('div');
+            if (!card) return;
+
+            card.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+            const isRight = (userChoice === 'Inclusivo');
+            const dir = isRight ? 380 : -380;
+            const rot = isRight ? 20 : -20;
+            card.style.transform = `translateX(${dir}px) rotate(${rot}deg)`;
+            card.style.opacity = '0';
+
+            setTimeout(() => {
+                evaluateAndNext(userChoice, currentItem.answer);
+            }, 250);
+        }
+
+        function completeMove(userChoice, expectedAnswer, card) {
+            card.style.opacity = '0';
+            const isRight = (userChoice === 'Inclusivo');
+            const dir = isRight ? 380 : -380;
+            card.style.transform = `translateX(${dir}px)`;
+            setTimeout(() => {
+                evaluateAndNext(userChoice, expectedAnswer);
+            }, 250);
+        }
+
+        function evaluateAndNext(userChoice, expectedAnswer) {
+            const isCorrect = (userChoice === expectedAnswer);
+            if (isCorrect) {
+                score++;
+                playSound('swipe-correct');
+                triggerParticles(true);
+            } else {
+                playSound('swipe-incorrect');
+                triggerParticles(false);
+            }
+
+            currentIndex++;
+            renderCurrentCard();
+        }
+
+        function showResults() {
+            playSound('win');
+            gameContainer.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+
+            document.getElementById('final-score').textContent = `${score}/${statements.length}`;
+            document.getElementById('correct-count').textContent = score;
+
+            const iconWrapper = document.getElementById('result-icon-wrapper');
+            const resultIcon = document.getElementById('result-icon');
+            const resultTitle = document.getElementById('result-title');
+            const resultSubtitle = document.getElementById('result-subtitle');
+
+            if (score === statements.length) {
+                iconWrapper.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-teal-100 text-teal-700 shadow-sm animate-pulse-soft";
+                resultIcon.className = "fa-solid fa-trophy";
+                resultTitle.textContent = "¡Excelente Trabajo!";
+                resultSubtitle.textContent = "Has demostrado una gran capacidad para identificar el lenguaje inclusivo frente al sexista.";
+                triggerParticles(true);
+            } else if (score >= 4) {
+                iconWrapper.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-teal-100 text-teal-700 shadow-sm animate-pulse-soft";
+                resultIcon.className = "fa-solid fa-circle-check";
+                resultTitle.textContent = "¡Muy Bien!";
+                resultSubtitle.textContent = "Reconoces muy bien la mayoría de expresiones inclusivas y sexistas.";
+                triggerParticles(true);
+            } else {
+                iconWrapper.className = "w-16 h-16 rounded-2xl mx-auto flex items-center justify-center text-2xl bg-rose-100 text-rose-600 shadow-sm animate-pulse-soft";
+                resultIcon.className = "fa-solid fa-book-open";
+                resultTitle.textContent = "Sigue Repasando";
+                resultSubtitle.textContent = "El lenguaje inclusivo es clave para la equidad. Te invitamos a repasar y volver a intentarlo.";
+            }
+        }
+
+        function resetActivity() {
+            playSound('click');
+            resultsScreen.classList.add('hidden');
+            welcomeScreen.classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>
